@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReservarRouteImport } from './routes/reservar'
 import { Route as MisReservasRouteImport } from './routes/mis-reservas'
 import { Route as EducacionRouteImport } from './routes/educacion'
@@ -17,6 +18,11 @@ import { Route as CalculadoraRouteImport } from './routes/calculadora'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReservarRoute = ReservarRouteImport.update({
   id: '/reservar',
   path: '/reservar',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/educacion': typeof EducacionRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/educacion': typeof EducacionRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/educacion': typeof EducacionRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/educacion'
     | '/mis-reservas'
     | '/reservar'
+    | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/educacion'
     | '/mis-reservas'
     | '/reservar'
+    | '/sitemap.xml'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/educacion'
     | '/mis-reservas'
     | '/reservar'
+    | '/sitemap.xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +131,18 @@ export interface RootRouteChildren {
   EducacionRoute: typeof EducacionRoute
   MisReservasRoute: typeof MisReservasRoute
   ReservarRoute: typeof ReservarRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reservar': {
       id: '/reservar'
       path: '/reservar'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   EducacionRoute: EducacionRoute,
   MisReservasRoute: MisReservasRoute,
   ReservarRoute: ReservarRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
