@@ -14,16 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          distrito: string | null
+          id: string
+          nombre: string
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          distrito?: string | null
+          id: string
+          nombre: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          distrito?: string | null
+          id?: string
+          nombre?: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reservas: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          descripcion_problema: string | null
+          direccion: string
+          distrito: string
+          estado: Database["public"]["Enums"]["reserva_estado"]
+          fecha_programada: string
+          hora_programada: string
+          id: string
+          precio_estimado: number | null
+          servicio_id: string
+          tecnico_id: string | null
+          telefono_contacto: string
+          updated_at: string
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          descripcion_problema?: string | null
+          direccion: string
+          distrito: string
+          estado?: Database["public"]["Enums"]["reserva_estado"]
+          fecha_programada: string
+          hora_programada: string
+          id?: string
+          precio_estimado?: number | null
+          servicio_id: string
+          tecnico_id?: string | null
+          telefono_contacto: string
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          descripcion_problema?: string | null
+          direccion?: string
+          distrito?: string
+          estado?: Database["public"]["Enums"]["reserva_estado"]
+          fecha_programada?: string
+          hora_programada?: string
+          id?: string
+          precio_estimado?: number | null
+          servicio_id?: string
+          tecnico_id?: string | null
+          telefono_contacto?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservas_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      servicios: {
+        Row: {
+          activo: boolean
+          created_at: string
+          descripcion: string
+          icono: string
+          id: string
+          nombre: string
+          precio_base: number
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          descripcion: string
+          icono?: string
+          id?: string
+          nombre: string
+          precio_base?: number
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          descripcion?: string
+          icono?: string
+          id?: string
+          nombre?: string
+          precio_base?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "cliente" | "tecnico" | "admin"
+      reserva_estado: "pendiente" | "asignado" | "completado" | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +290,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["cliente", "tecnico", "admin"],
+      reserva_estado: ["pendiente", "asignado", "completado", "cancelado"],
+    },
   },
 } as const
