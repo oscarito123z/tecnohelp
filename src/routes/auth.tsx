@@ -37,7 +37,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) navigate({ to: "/mis-reservas" });
+    if (user) navigate({ to: "/reservar" });
   }, [user, navigate]);
 
   return (
@@ -141,7 +141,7 @@ function SignUpForm() {
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/mis-reservas`,
+        emailRedirectTo: `${window.location.origin}/reservar`,
         data: { nombre: parsed.data.nombre, telefono: parsed.data.telefono },
       },
     });
