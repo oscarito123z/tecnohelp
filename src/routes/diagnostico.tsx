@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +16,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { DISTRITOS_MANAGUA, whatsappLink } from "@/lib/constants";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/diagnostico")({
   head: () => ({
@@ -52,12 +54,20 @@ const URGENCIA = [
 
 function DiagnosticoPage() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [paso, setPaso] = useState(1);
   const [equipo, setEquipo] = useState("");
   const [sintomas, setSintomas] = useState<string[]>([]);
   const [distrito, setDistrito] = useState("");
   const [urgencia, setUrgencia] = useState("");
   const [detalles, setDetalles] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.info("Inicia sesión para hacer tu pre-diagnóstico");
+      navigate({ to: "/auth" });
+    }
+  }, [authLoading, user, navigate]);
 
   const total = 5;
   const progreso = (paso / total) * 100;
