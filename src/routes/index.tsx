@@ -109,17 +109,6 @@ function HomePage() {
                 width={1536}
                 height={1024}
               />
-              <div className="absolute -bottom-5 left-5 right-5 sm:right-auto sm:max-w-xs bg-card text-card-foreground rounded-2xl p-4 shadow-card-hover">
-                <div className="flex items-center gap-3">
-                  <div className="grid size-12 place-items-center rounded-full bg-success text-success-foreground">
-                    <CheckCircle2 className="size-7" />
-                  </div>
-                  <div>
-                    <p className="font-display font-bold">+1,200 visitas</p>
-                    <p className="text-sm text-muted-foreground">familias y negocios atendidos</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </section>
