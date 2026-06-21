@@ -29,15 +29,15 @@ type Recurso = {
 
 // IDs reales de tutoriales en español de YouTube
 const RECURSOS: Recurso[] = [
-  { id: "1", titulo: "Cómo encender y apagar tu computadora", desc: "El primer paso, sin miedo y bien explicado.", categoria: "Básico", tipo: "video", duracion: "3 min", youtubeId: "Cg9wOybQOpw" },
-  { id: "2", titulo: "Usar el mouse y el teclado", desc: "Clic, doble clic y atajos esenciales.", categoria: "Básico", tipo: "video", duracion: "5 min", youtubeId: "1QXOd2ZQs-Q" },
-  { id: "3", titulo: "Buscar información en Google", desc: "Aprende a buscar lo que necesitas y reconocer resultados confiables.", categoria: "Internet", tipo: "video", duracion: "6 min", youtubeId: "Jm-pjnIMSr4" },
-  { id: "4", titulo: "Descargar archivos con seguridad", desc: "Cómo saber si un archivo es seguro antes de abrirlo.", categoria: "Seguridad", tipo: "infografía", duracion: "2 min", youtubeId: "WnyJSesQI_M" },
-  { id: "5", titulo: "Enviar tu primer correo electrónico", desc: "Paso a paso para escribir, adjuntar y enviar.", categoria: "Correo", tipo: "video", duracion: "7 min", youtubeId: "byVCNagqSjY" },
-  { id: "6", titulo: "Usar WhatsApp Web en tu computadora", desc: "Sincroniza tus chats y escribe más rápido.", categoria: "WhatsApp", tipo: "video", duracion: "4 min", youtubeId: "TmHmHKgvgVc" },
-  { id: "7", titulo: "Reconocer estafas y mensajes falsos", desc: "Las 5 señales que indican un fraude por internet.", categoria: "Seguridad", tipo: "infografía", duracion: "3 min", youtubeId: "1JlUe0i8wzE" },
-  { id: "8", titulo: "Crear tu contraseña segura", desc: "Cómo inventar contraseñas que recuerdes pero nadie adivine.", categoria: "Seguridad", tipo: "infografía", duracion: "2 min", youtubeId: "3NjQ9b3pgIg" },
-  { id: "9", titulo: "Hacer videollamadas con tu familia", desc: "WhatsApp, Zoom y Google Meet, explicados con calma.", categoria: "WhatsApp", tipo: "video", duracion: "8 min", youtubeId: "8jPQjjsBbIc" },
+  { id: "1", titulo: "Cómo encender y apagar tu computadora", desc: "El primer paso, sin miedo y bien explicado.", categoria: "Básico", tipo: "video", duracion: "3 min", youtubeId: "8eKsTPBVNfw" },
+  { id: "2", titulo: "Usar el mouse y el teclado", desc: "Clic, doble clic y atajos esenciales.", categoria: "Básico", tipo: "video", duracion: "5 min", youtubeId: "_yz34GH-tAU" },
+  { id: "3", titulo: "Buscar información en Google", desc: "Aprende a buscar lo que necesitas y reconocer resultados confiables.", categoria: "Internet", tipo: "video", duracion: "6 min", youtubeId: "yJgyf-n0T8s" },
+  { id: "4", titulo: "Descargar archivos con seguridad", desc: "Cómo saber si un archivo es seguro antes de abrirlo.", categoria: "Seguridad", tipo: "infografía", duracion: "2 min", youtubeId: "5OuhZY66LtA" },
+  { id: "5", titulo: "Enviar tu primer correo electrónico", desc: "Paso a paso para escribir, adjuntar y enviar.", categoria: "Correo", tipo: "video", duracion: "7 min", youtubeId: "hVOkCAQVepA" },
+  { id: "6", titulo: "Usar WhatsApp Web en tu computadora", desc: "Sincroniza tus chats y escribe más rápido.", categoria: "WhatsApp", tipo: "video", duracion: "4 min", youtubeId: "6M-bcARi8sk" },
+  { id: "7", titulo: "Reconocer estafas y mensajes falsos", desc: "Las 5 señales que indican un fraude por internet.", categoria: "Seguridad", tipo: "infografía", duracion: "3 min", youtubeId: "ao4EUN04oeU" },
+  { id: "8", titulo: "Crear tu contraseña segura", desc: "Cómo inventar contraseñas que recuerdes pero nadie adivine.", categoria: "Seguridad", tipo: "infografía", duracion: "2 min", youtubeId: "pS6sf2BwmWY" },
+  { id: "9", titulo: "Hacer videollamadas con tu familia", desc: "WhatsApp, Zoom y Google Meet, explicados con calma.", categoria: "WhatsApp", tipo: "video", duracion: "8 min", youtubeId: "edGq8hQ5__4" },
 ];
 
 const CATEGORIAS = ["Todos", "Básico", "Internet", "Correo", "WhatsApp", "Seguridad"] as const;
