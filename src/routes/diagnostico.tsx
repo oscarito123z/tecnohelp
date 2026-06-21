@@ -54,12 +54,20 @@ const URGENCIA = [
 
 function DiagnosticoPage() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [paso, setPaso] = useState(1);
   const [equipo, setEquipo] = useState("");
   const [sintomas, setSintomas] = useState<string[]>([]);
   const [distrito, setDistrito] = useState("");
   const [urgencia, setUrgencia] = useState("");
   const [detalles, setDetalles] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.info("Inicia sesión para hacer tu pre-diagnóstico");
+      navigate({ to: "/auth" });
+    }
+  }, [authLoading, user, navigate]);
 
   const total = 5;
   const progreso = (paso / total) * 100;
