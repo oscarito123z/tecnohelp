@@ -40,7 +40,7 @@ function LoginTrabajadoresPage() {
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["staff-list"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_staff_list");
+      const { data, error } = await (supabase as any).rpc("get_staff_list");
       if (error) throw error;
       return (data ?? []) as Staff[];
     },
@@ -165,7 +165,7 @@ function ResetForm({ staff, loading, onBack }: { staff: Staff[]; loading: boolea
     if (pin !== "TECNOHELP") return toast.error("PIN maestro incorrecto");
     if (newPw.length < 4) return toast.error("Mínimo 4 caracteres");
     setSubmitting(true);
-    const { error } = await supabase.rpc("reset_staff_password", {
+    const { error } = await (supabase as any).rpc("reset_staff_password", {
       p_user_id: staffId,
       p_pin: pin,
       p_new_password: newPw,

@@ -219,7 +219,7 @@ function EquipoTab() {
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["staff-list"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_staff_list");
+      const { data, error } = await (supabase as any).rpc("get_staff_list");
       if (error) throw error;
       return (data ?? []) as StaffRow[];
     },
@@ -238,7 +238,7 @@ function EquipoTab() {
     if (password.length < 4) return toast.error("La contraseña debe tener al menos 4 caracteres");
 
     setSubmitting(true);
-    const { error } = await supabase.rpc("create_staff_user", {
+    const { error } = await (supabase as any).rpc("create_staff_user", {
       p_nombre: nombre.trim(),
       p_email: email.trim().toLowerCase(),
       p_password: password,
