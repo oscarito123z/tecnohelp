@@ -153,11 +153,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_staff_user: {
+        Args: {
+          p_email: string
+          p_nombre: string
+          p_password: string
+          p_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: string
+      }
+      get_staff_list: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          nombre: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      reset_staff_password: {
+        Args: { p_new_password: string; p_pin: string; p_user_id: string }
         Returns: boolean
       }
     }
