@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReservarRouteImport } from './routes/reservar'
 import { Route as MisReservasRouteImport } from './routes/mis-reservas'
+import { Route as LoginTrabajadoresRouteImport } from './routes/login-trabajadores'
 import { Route as EducacionRouteImport } from './routes/educacion'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as CalculadoraRouteImport } from './routes/calculadora'
@@ -32,6 +33,11 @@ const ReservarRoute = ReservarRouteImport.update({
 const MisReservasRoute = MisReservasRouteImport.update({
   id: '/mis-reservas',
   path: '/mis-reservas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginTrabajadoresRoute = LoginTrabajadoresRouteImport.update({
+  id: '/login-trabajadores',
+  path: '/login-trabajadores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EducacionRoute = EducacionRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/calculadora': typeof CalculadoraRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educacion': typeof EducacionRoute
+  '/login-trabajadores': typeof LoginTrabajadoresRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/calculadora': typeof CalculadoraRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educacion': typeof EducacionRoute
+  '/login-trabajadores': typeof LoginTrabajadoresRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/calculadora': typeof CalculadoraRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educacion': typeof EducacionRoute
+  '/login-trabajadores': typeof LoginTrabajadoresRoute
   '/mis-reservas': typeof MisReservasRoute
   '/reservar': typeof ReservarRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/calculadora'
     | '/diagnostico'
     | '/educacion'
+    | '/login-trabajadores'
     | '/mis-reservas'
     | '/reservar'
     | '/sitemap.xml'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/calculadora'
     | '/diagnostico'
     | '/educacion'
+    | '/login-trabajadores'
     | '/mis-reservas'
     | '/reservar'
     | '/sitemap.xml'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/calculadora'
     | '/diagnostico'
     | '/educacion'
+    | '/login-trabajadores'
     | '/mis-reservas'
     | '/reservar'
     | '/sitemap.xml'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   CalculadoraRoute: typeof CalculadoraRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   EducacionRoute: typeof EducacionRoute
+  LoginTrabajadoresRoute: typeof LoginTrabajadoresRoute
   MisReservasRoute: typeof MisReservasRoute
   ReservarRoute: typeof ReservarRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/mis-reservas'
       fullPath: '/mis-reservas'
       preLoaderRoute: typeof MisReservasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login-trabajadores': {
+      id: '/login-trabajadores'
+      path: '/login-trabajadores'
+      fullPath: '/login-trabajadores'
+      preLoaderRoute: typeof LoginTrabajadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/educacion': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculadoraRoute: CalculadoraRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   EducacionRoute: EducacionRoute,
+  LoginTrabajadoresRoute: LoginTrabajadoresRoute,
   MisReservasRoute: MisReservasRoute,
   ReservarRoute: ReservarRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
