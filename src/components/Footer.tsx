@@ -36,10 +36,6 @@ export function Footer() {
               <a href="tel:+50584592904" className="hover:text-primary">+505 8459 2904</a>
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="size-5 text-primary" aria-hidden="true" />
-              <a href="mailto:hola@tecnohelp.ni" className="hover:text-primary">hola@tecnohelp.ni</a>
-            </li>
-            <li className="flex items-center gap-2">
               <MapPin className="size-5 text-primary" aria-hidden="true" />
               Managua, Nicaragua
             </li>
