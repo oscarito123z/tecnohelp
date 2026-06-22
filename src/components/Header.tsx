@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogIn, UserCircle2 } from "lucide-react";
+import { Menu, X, LogIn, UserCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +15,7 @@ const NAV = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   useEffect(() => setOpen(false), []);
 
   return (
@@ -43,6 +43,15 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="px-4 py-2 rounded-lg text-base font-semibold text-accent-foreground bg-accent/20 hover:bg-accent/30 transition-colors inline-flex items-center gap-1.5"
+              activeProps={{ className: "bg-accent text-accent-foreground" }}
+            >
+              <ShieldCheck className="size-4" /> Panel Técnico
+            </Link>
+          )}
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
@@ -96,6 +105,15 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="px-4 py-3 rounded-lg text-lg font-semibold bg-accent/20 inline-flex items-center gap-2"
+              >
+                <ShieldCheck className="size-5" /> Panel Técnico
+              </Link>
+            )}
             <div className="pt-2 border-t border-border mt-2 flex flex-col gap-2">
               {user ? (
                 <>
