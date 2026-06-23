@@ -126,6 +126,7 @@ function SignInForm() {
 }
 
 function SignUpForm() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ nombre: "", email: "", password: "", telefono: "" });
 
