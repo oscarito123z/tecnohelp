@@ -142,13 +142,16 @@ function SignUpForm() {
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/reservar`,
+        emailRedirectTo: `${window.location.origin}/`,
         data: { nombre: parsed.data.nombre, telefono: parsed.data.telefono },
       },
     });
     setLoading(false);
     if (error) toast.error("No pudimos crear tu cuenta: " + error.message);
-    else toast.success("¡Cuenta creada! Ya puedes agendar citas.");
+    else {
+      toast.success("¡Cuenta creada! Ya puedes agendar citas.");
+      navigate({ to: "/" });
+    }
   }
 
   return (
