@@ -15,7 +15,8 @@ const NAV = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isTecnico } = useAuth();
+  const isStaff = isAdmin || isTecnico;
   useEffect(() => setOpen(false), []);
 
   return (
@@ -43,7 +44,7 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-          {isAdmin && (
+          {isStaff && (
             <Link
               to="/admin"
               className="px-4 py-2 rounded-lg text-base font-semibold text-accent-foreground bg-accent/20 hover:bg-accent/30 transition-colors inline-flex items-center gap-1.5"
@@ -105,7 +106,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            {isAdmin && (
+            {isStaff && (
               <Link
                 to="/admin"
                 onClick={() => setOpen(false)}
