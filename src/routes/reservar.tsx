@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -48,6 +48,7 @@ const reservaSchema = z.object({
 function ReservarPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -114,6 +115,7 @@ function ReservarPage() {
       toast.error("No pudimos guardar la reserva: " + error.message);
       return;
     }
+    qc.invalidateQueries({ queryKey: ["mis-reservas"] });
     setDone(true);
   }
 

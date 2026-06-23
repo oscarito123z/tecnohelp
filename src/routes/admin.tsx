@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calendar, MapPin, Phone, ShieldCheck, ArrowLeft, Users, ClipboardList, UserPlus } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import {
+  Calendar, MapPin, Phone, ShieldCheck, ArrowLeft, Users,
+  ClipboardList, UserPlus, BarChart3, CalendarDays, CalendarRange,
+} from "lucide-react";
+import { format, parseISO, startOfDay, startOfWeek, startOfMonth, isAfter } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,11 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -23,9 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({
-    meta: [{ title: "Panel Técnico · TecnoHelp" }],
-  }),
+  head: () => ({ meta: [{ title: "Panel Técnico · TecnoHelp" }] }),
   component: AdminPage,
 });
 
@@ -37,7 +34,7 @@ const ESTADOS = [
 ] as const;
 
 function AdminPage() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isStaff, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,13 +42,13 @@ function AdminPage() {
     if (!user) {
       toast.info("Inicia sesión como trabajador");
       navigate({ to: "/login-trabajadores" });
-    } else if (!isAdmin) {
+    } else if (!isStaff) {
       toast.error("Acceso restringido al equipo técnico");
       navigate({ to: "/" });
     }
-  }, [loading, user, isAdmin, navigate]);
+  }, [loading, user, isStaff, navigate]);
 
-  if (loading || !user || !isAdmin) {
+  if (loading || !user || !isStaff) {
     return (
       <div className="min-h-dvh flex flex-col">
         <Header />
@@ -75,27 +72,39 @@ function AdminPage() {
             <ShieldCheck className="size-6" />
           </div>
           <div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold">Panel Técnico</h1>
-            <p className="text-base text-muted-foreground">Reservas y gestión del equipo TecnoHelp.</p>
+            <h1 className="font-display text-3xl md:text-4xl font-bold">Panel {isAdmin ? "Administrativo" : "Técnico"}</h1>
+            <p className="text-base text-muted-foreground">
+              {isAdmin ? "Métricas, reservas y gestión del equipo." : "Reservas asignadas al equipo TecnoHelp."}
+            </p>
           </div>
         </div>
 
-        <Tabs defaultValue="reservas">
-          <TabsList className="h-12 mb-6">
+        <Tabs defaultValue={isAdmin ? "dashboard" : "reservas"}>
+          <TabsList className="h-12 mb-6 flex-wrap">
+            {isAdmin && (
+              <TabsTrigger value="dashboard" className="text-base gap-2">
+                <BarChart3 className="size-4" /> Dashboard
+              </TabsTrigger>
+            )}
             <TabsTrigger value="reservas" className="text-base gap-2">
               <ClipboardList className="size-4" /> Reservas
             </TabsTrigger>
-            <TabsTrigger value="equipo" className="text-base gap-2">
-              <Users className="size-4" /> Gestión de Equipo
-            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="equipo" className="text-base gap-2">
+                <Users className="size-4" /> Gestión de Equipo
+              </TabsTrigger>
+            )}
           </TabsList>
 
+          {isAdmin && (
+            <TabsContent value="dashboard"><DashboardTab /></TabsContent>
+          )}
           <TabsContent value="reservas">
-            <ReservasTab />
+            <ReservasTab canManageAll={isAdmin} />
           </TabsContent>
-          <TabsContent value="equipo">
-            <EquipoTab />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="equipo"><EquipoTab /></TabsContent>
+          )}
         </Tabs>
       </main>
       <Footer />
@@ -104,9 +113,8 @@ function AdminPage() {
   );
 }
 
-function ReservasTab() {
-  const qc = useQueryClient();
-  const { data: reservas = [], isLoading } = useQuery({
+function useReservas() {
+  return useQuery({
     queryKey: ["admin-reservas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -117,6 +125,83 @@ function ReservasTab() {
       return data;
     },
   });
+}
+
+function DashboardTab() {
+  const { data: reservas = [], isLoading } = useReservas();
+
+  const metrics = useMemo(() => {
+    const today = startOfDay(new Date());
+    const week = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const month = startOfMonth(new Date());
+    let daily = 0, weekly = 0, monthly = 0, ingresos = 0;
+    for (const r of reservas) {
+      const d = parseISO(r.fecha_programada);
+      if (!isAfter(today, d)) {
+        if (d.getTime() === today.getTime()) daily++;
+      }
+      if (isAfter(d, today) || d.getTime() === today.getTime()) {
+        // future or today (kept simple below)
+      }
+      if (isAfter(d, week) || d.getTime() === week.getTime()) weekly++;
+      if (isAfter(d, month) || d.getTime() === month.getTime()) monthly++;
+      if (r.estado === "completado") ingresos += Number(r.precio_estimado ?? 0);
+    }
+    // recompute "daily" more accurately
+    daily = reservas.filter((r) => {
+      const d = parseISO(r.fecha_programada);
+      return startOfDay(d).getTime() === today.getTime();
+    }).length;
+    return { daily, weekly, monthly, ingresos, total: reservas.length };
+  }, [reservas]);
+
+  if (isLoading) return <p className="text-lg text-muted-foreground">Cargando métricas…</p>;
+
+  const cards = [
+    { label: "Citas hoy", value: metrics.daily, icon: CalendarDays, cls: "bg-primary text-primary-foreground" },
+    { label: "Esta semana", value: metrics.weekly, icon: CalendarRange, cls: "bg-accent text-accent-foreground" },
+    { label: "Este mes", value: metrics.monthly, icon: Calendar, cls: "bg-success text-success-foreground" },
+    { label: "Total registradas", value: metrics.total, icon: ClipboardList, cls: "bg-secondary text-secondary-foreground border border-border" },
+  ];
+
+  const porEstado = ESTADOS.map((e) => ({ ...e, count: reservas.filter((r) => r.estado === e.value).length }));
+
+  return (
+    <div className="space-y-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((c) => (
+          <div key={c.label} className={`rounded-2xl p-5 shadow-soft ${c.cls}`}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold opacity-90">{c.label}</p>
+              <c.icon className="size-6 opacity-80" />
+            </div>
+            <p className="font-display text-4xl font-extrabold">{c.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <section className="rounded-2xl bg-card border border-border p-6 shadow-soft">
+        <h2 className="font-display text-xl font-bold mb-4">Distribución por estado</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {porEstado.map((e) => (
+            <div key={e.value} className={`rounded-xl border p-4 ${e.cls}`}>
+              <p className="text-sm font-semibold opacity-80">{e.label}</p>
+              <p className="font-display text-3xl font-bold">{e.count}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground">Ingresos por trabajos completados</p>
+          <p className="font-display text-3xl font-bold text-primary">C$ {metrics.ingresos.toLocaleString()}</p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ReservasTab({ canManageAll }: { canManageAll: boolean }) {
+  const qc = useQueryClient();
+  const { data: reservas = [], isLoading } = useReservas();
 
   async function cambiarEstado(id: string, estado: string) {
     const { error } = await supabase
@@ -127,25 +212,12 @@ function ReservasTab() {
     else {
       toast.success("Estado actualizado");
       qc.invalidateQueries({ queryKey: ["admin-reservas"] });
+      qc.invalidateQueries({ queryKey: ["mis-reservas"] });
     }
   }
 
-  const totales = ESTADOS.map((e) => ({
-    ...e,
-    count: reservas.filter((r) => r.estado === e.value).length,
-  }));
-
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        {totales.map((t) => (
-          <div key={t.value} className={`rounded-2xl border p-4 ${t.cls}`}>
-            <p className="text-sm font-semibold opacity-80">{t.label}</p>
-            <p className="font-display text-3xl font-bold">{t.count}</p>
-          </div>
-        ))}
-      </div>
-
       {isLoading ? (
         <p className="text-lg text-muted-foreground">Cargando reservas…</p>
       ) : reservas.length === 0 ? (
@@ -191,7 +263,9 @@ function ReservasTab() {
                     C$ {r.precio_estimado ?? "—"}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {ESTADOS.filter((e) => e.value !== r.estado).map((e) => (
+                    {ESTADOS.filter((e) => e.value !== r.estado)
+                      .filter((e) => canManageAll || e.value !== "cancelado")
+                      .map((e) => (
                       <Button
                         key={e.value}
                         size="sm"
@@ -245,10 +319,7 @@ function EquipoTab() {
       p_role: role,
     });
     setSubmitting(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) { toast.error(error.message); return; }
     toast.success(`${nombre} fue agregado al equipo`);
     setNombre(""); setEmail(""); setPassword(""); setRole("tecnico");
     qc.invalidateQueries({ queryKey: ["staff-list"] });
