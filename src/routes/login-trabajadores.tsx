@@ -29,13 +29,13 @@ export const Route = createFileRoute("/login-trabajadores")({
 type Staff = { id: string; nombre: string; email: string; role: "admin" | "tecnico" };
 
 function LoginTrabajadoresPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isStaff } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "reset">("signin");
 
   useEffect(() => {
-    if (user && isAdmin) navigate({ to: "/admin" });
-  }, [user, isAdmin, navigate]);
+    if (user && isStaff) navigate({ to: "/admin" });
+  }, [user, isStaff, navigate]);
 
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["staff-list"],
