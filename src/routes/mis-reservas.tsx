@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/mis-reservas")({
   head: () => ({
-    meta: [{ title: "Mis reservas · TecnoHelp" }],
+    meta: [{ title: "Mis reservas   TecnoHelp" }],
   }),
   component: MisReservasPage,
 });
@@ -42,7 +42,9 @@ function MisReservasPage() {
       const { data, error } = await supabase
         .from("reservas")
         .select("*, servicios(nombre, precio_base)")
+        .eq("cliente_id", user!.id)
         .order("fecha_programada", { ascending: false });
+
       if (error) throw error;
       return data;
     },
@@ -51,6 +53,7 @@ function MisReservasPage() {
   async function cancelar(id: string) {
     const ok = window.confirm("¿Cancelar esta reserva?");
     if (!ok) return;
+
     const { error } = await supabase.from("reservas").update({ estado: "cancelado" }).eq("id", id);
     if (error) toast.error("No pudimos cancelar: " + error.message);
     else {
@@ -74,7 +77,7 @@ function MisReservasPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-lg text-muted-foreground">Cargando…</p>
+          <p className="text-lg text-muted-foreground">Cargando...</p>
         ) : reservas.length === 0 ? (
           <div className="rounded-3xl bg-card border border-border p-12 text-center shadow-soft">
             <Calendar className="mx-auto size-16 text-muted-foreground mb-4" strokeWidth={1.5} />
@@ -94,13 +97,14 @@ function MisReservasPage() {
                         {(r as any).servicios?.nombre ?? "Servicio"}
                       </h2>
                       <p className="text-base text-muted-foreground mt-0.5">
-                        {format(parseISO(r.fecha_programada), "EEEE d 'de' MMMM yyyy", { locale: es })} · {r.hora_programada}
+                        {format(parseISO(r.fecha_programada), "EEEE d 'de' MMMM yyyy", { locale: es })} • {r.hora_programada}
                       </p>
                     </div>
                     <span className={`text-sm font-bold px-3 py-1.5 rounded-full border ${est.cls}`}>
                       {est.label}
                     </span>
                   </div>
+
                   <div className="grid sm:grid-cols-2 gap-3 text-base">
                     <p className="flex items-start gap-2">
                       <MapPin className="size-5 text-primary mt-0.5 shrink-0" />
@@ -110,14 +114,16 @@ function MisReservasPage() {
                       <Phone className="size-5 text-primary" /> {r.telefono_contacto}
                     </p>
                   </div>
+
                   {r.descripcion_problema && (
                     <p className="text-base text-muted-foreground mt-3 border-t border-border pt-3">
                       "{r.descripcion_problema}"
                     </p>
                   )}
+
                   <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-border">
                     <p className="font-display text-xl font-bold text-primary">
-                      C$ {r.precio_estimado ?? "—"}
+                      C$ {r.precio_estimado ?? "---"}
                     </p>
                     {r.estado === "pendiente" && (
                       <Button variant="outline" onClick={() => cancelar(r.id)}>

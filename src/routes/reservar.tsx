@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar as CalendarIcon, CheckCircle2, ArrowLeft } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ import { DISTRITOS_MANAGUA, HORARIOS } from "@/lib/constants";
 export const Route = createFileRoute("/reservar")({
   head: () => ({
     meta: [
-      { title: "Agendar visita técnica · TecnoHelp" },
+      { title: "Agendar visita técnica   TecnoHelp" },
       { name: "description", content: "Elige fecha, hora y distrito. Te confirmamos la visita en menos de 24 horas." },
     ],
   }),
@@ -65,6 +66,7 @@ function ReservarPage() {
         .select("id, nombre, precio_base")
         .eq("activo", true)
         .order("precio_base");
+
       if (error) throw error;
       return data;
     },
@@ -77,12 +79,14 @@ function ReservarPage() {
   const [direccion, setDireccion] = useState("");
   const [telefono, setTelefono] = useState("");
   const [descripcion, setDescripcion] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
+
     const parsed = reservaSchema.safeParse({
       servicio_id: servicioId,
       fecha,
@@ -92,11 +96,14 @@ function ReservarPage() {
       telefono,
       descripcion,
     });
+
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+
     const servicio = servicios.find((s) => s.id === servicioId);
+
     setSubmitting(true);
     const { error } = await supabase.from("reservas").insert({
       cliente_id: user.id,
@@ -111,11 +118,14 @@ function ReservarPage() {
       estado: "pendiente",
     });
     setSubmitting(false);
+
     if (error) {
       toast.error("No pudimos guardar la reserva: " + error.message);
       return;
     }
-    qc.invalidateQueries({ queryKey: ["mis-reservas"] });
+
+    await qc.invalidateQueries({ queryKey: ["mis-reservas", user.id] });
+    await qc.invalidateQueries({ queryKey: ["admin-reservas"] });
     setDone(true);
   }
 
@@ -156,6 +166,7 @@ function ReservarPage() {
         <Link to="/" className="inline-flex items-center gap-2 text-base font-semibold text-primary hover:underline mb-6">
           <ArrowLeft className="size-5" /> Inicio
         </Link>
+
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
           <div>
             <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">Agendar visita técnica</h1>
@@ -174,7 +185,7 @@ function ReservarPage() {
                   <SelectContent>
                     {servicios.map((s) => (
                       <SelectItem key={s.id} value={s.id} className="text-base">
-                        {s.nombre} — desde C$ {s.precio_base}
+                        {s.nombre} • desde C$ {s.precio_base}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -285,7 +296,7 @@ function ReservarPage() {
               </Section>
 
               <Button type="submit" size="xl" className="w-full" disabled={submitting}>
-                <CalendarIcon /> {submitting ? "Guardando…" : "Confirmar reserva"}
+                <CalendarIcon /> {submitting ? "Guardando..." : "Confirmar reserva"}
               </Button>
             </form>
           </div>
@@ -294,14 +305,15 @@ function ReservarPage() {
           <aside className="lg:sticky lg:top-28 h-fit">
             <div className="rounded-2xl bg-primary text-primary-foreground p-6 shadow-card-hover">
               <h2 className="font-display text-xl font-bold mb-4">Tu reserva</h2>
-              <ResumenItem label="Servicio" value={servicios.find((s) => s.id === servicioId)?.nombre ?? "—"} />
-              <ResumenItem label="Fecha" value={fecha ? format(fecha, "PPP", { locale: es }) : "—"} />
-              <ResumenItem label="Hora" value={hora || "—"} />
-              <ResumenItem label="Distrito" value={distrito || "—"} />
+              <ResumenItem label="Servicio" value={servicios.find((s) => s.id === servicioId)?.nombre ?? "---"} />
+              <ResumenItem label="Fecha" value={fecha ? format(fecha, "PPP", { locale: es }) : "---"} />
+              <ResumenItem label="Hora" value={hora || "---"} />
+              <ResumenItem label="Distrito" value={distrito || "---"} />
+              
               <div className="mt-4 pt-4 border-t border-primary-foreground/20">
                 <p className="text-sm opacity-80">Precio estimado</p>
                 <p className="font-display text-3xl font-bold text-accent">
-                  C$ {servicios.find((s) => s.id === servicioId)?.precio_base ?? "—"}
+                  C$ {servicios.find((s) => s.id === servicioId)?.precio_base ?? "---"}
                 </p>
                 <p className="text-xs opacity-80 mt-1">Pago al finalizar la visita</p>
               </div>

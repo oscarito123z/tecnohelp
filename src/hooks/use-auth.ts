@@ -10,36 +10,49 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (!s?.user) { setIsAdmin(false); setIsTecnico(false); }
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
     let cancelled = false;
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .then(({ data }) => {
-        if (cancelled) return;
-        const roles = (data ?? []).map((r: any) => r.role);
-        setIsAdmin(roles.includes("admin"));
-        setIsTecnico(roles.includes("tecnico"));
-      });
-    return () => { cancelled = true; };
-  }, [user]);
+
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data.session?.user ?? null;
+      
+      if (cancelled) return;
+      
+      setSession(data.session);
+      setUser(currentUser);
+
+      if (!currentUser) {
+        setIsAdmin(false);
+        setIsTecnico(false);
+        setLoading(false);
+        return;
+      }
+
+      // La clave: Esperar a tener el rol antes de quitar el "loading"
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id);
+        
+      if (cancelled) return;
+
+      const roles = (roleData ?? []).map((r: any) => r.role);
+      setIsAdmin(roles.includes("admin"));
+      setIsTecnico(roles.includes("tecnico"));
+      setLoading(false);
+    };
+
+    checkAuth();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      checkAuth();
+    });
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   return { session, user, isAdmin, isTecnico, isStaff: isAdmin || isTecnico, loading };
 }
